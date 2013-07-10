@@ -1,7 +1,7 @@
 var setupSqlInsertFormatter = function() {
         
-    $('#output').text('Ready'); };
-/*    
+    $('#output').text('Ready');
+
     var splitArgList = function (s) {
         var first_paren = s.indexOf('(') + 1;
         var opening = s.substring(0, first_paren).trim();
@@ -53,5 +53,4 @@ var setupSqlInsertFormatter = function() {
         var output = insert_clause_split[0] + insert_args.join(', ') + insert_clause_split[2] + '\n' + values_clause_split[0] + values_args.join(', ') + values_clause_split[2];
         $('#output').text(output);
     });
-*/
-
+}
