@@ -54,7 +54,7 @@ var setupSqlInsertFormatter = function() {
     }
     
     var formatAllInsertStatements = function(sql) {
-        var insertRegex = /INSERT INTO .* VALUES \(.*\)/igm;
+        var insertRegex = /INSERT .* VALUES \(.*\)/igm;
         return sql.replace(insertRegex, function(match) {
             return formatInsertStatement(match);
         });
@@ -65,5 +65,4 @@ var setupSqlInsertFormatter = function() {
         var output = formatAllInsertStatements(sql) + "\n";
         $('#output').text(output);
     });
-
 }
