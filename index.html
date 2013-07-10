@@ -22,7 +22,7 @@
     <header>
       <div class="container">
         <h1>SQL Insert Formatter</h1>
-        <h2>It just does one thing</h2>
+        <h2>It just does the one thing</h2>
 
         <section id="downloads">
           <a href="https://github.com/jfoshee/format-sql-insert/zipball/master" class="btn">Download as .zip</a>
@@ -34,14 +34,23 @@
 
     <div class="container">
       <section id="main_content">
-        <textarea id="sql" rows="8" cols="50">INSERT INTO Production.UnitMeasure (Name, UnitMeasureCode, ModifiedDate) VALUES (N'Square Yards', N'Y2', GETDATE());</textarea>
+        Enter a SQL Insert statement to format it such that column names line up with values. 
+        <textarea id="sql" rows="4" cols="80">INSERT INTO Production.UnitMeasure (Name, UnitMeasureCode, ModifiedDate) VALUES (N'Square Yards', N'Y2', GETDATE());</textarea>
         <br />
-        <a href="#" id="format">Format</a>        
+        <a class="btn" href="#" id="format">Format</a>        
         <br />
         <pre id="output">...
         </pre>
       </section>
     </div>
     
+    <footer>
+        <div class="container"><h6>
+            Use at your own risk. 
+            Known issues: Can't handle mismatched numbers of items and can't handle commas in values. 
+            Pull requests welcome if the code is clean. &#9786; &pi;
+            </h6>
+        </div>
+    </footer>
   </body>
 </html>
