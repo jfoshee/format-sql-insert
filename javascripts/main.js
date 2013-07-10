@@ -1,7 +1,6 @@
 var setupSqlInsertFormatter = function() {
-        
     $('#output').text('Ready');
-
+    
     var splitArgList = function (s) {
         var first_paren = s.indexOf('(') + 1;
         var opening = s.substring(0, first_paren).trim();
@@ -38,8 +37,7 @@ var setupSqlInsertFormatter = function() {
         return [A, B];
     }
     
-    $('#format').click(function () {
-        var sql = $('#sql').val();
+    var formatInsertStatement = function(sql) {
         var insert_index = sql.indexOf('VALUES');
         var insert_clause = sql.substring(0, insert_index);
         var values_clause = sql.substring(insert_index);
@@ -50,7 +48,22 @@ var setupSqlInsertFormatter = function() {
         padByLonger(insert_args, values_args);
         var opening_length = insert_clause_split[0].length;
         values_clause_split[0] = padLeft(values_clause_split[0], opening_length);
-        var output = insert_clause_split[0] + insert_args.join(', ') + insert_clause_split[2] + '\n' + values_clause_split[0] + values_args.join(', ') + values_clause_split[2];
+        var output = insert_clause_split[0] + insert_args.join(', ') + insert_clause_split[2] + '\n' +
+                     values_clause_split[0] + values_args.join(', ') + values_clause_split[2];
+        return output;
+    }
+    
+    var formatAllInsertStatements = function(sql) {
+        var insertRegex = /INSERT INTO .* VALUES \(.*\)/igm;
+        return sql.replace(insertRegex, function(match) {
+            return formatInsertStatement(match);
+        });
+    }
+    
+    $('#format').click(function () {
+        var sql = $('#sql').val();
+        var output = formatAllInsertStatements(sql) + "\n";
         $('#output').text(output);
     });
+
 }
