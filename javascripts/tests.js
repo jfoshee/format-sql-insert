@@ -29,9 +29,15 @@ test( "Move next interesting to beginning", function() {
 });
 
 test( "Move all interesting to beginning", function() {
-    var names =  [ "A", "B", "C", "D", "E", "F", "G", "H", "I"];
-    var values = [ "0", "1", "0", "2", "3", "0", "0", "4", "0" ];
+    var names =  [ "A", "B",  "C", "D", "E",   "F",    "G", "H", "I"];
+    var values = [ "0", "1", "''", "2", "3", "N''", "Null", "4", "0" ];
     orderByInterestingValues(names, values);
-    deepEqual(names,  [ "B", "D", "E", "H", "A", "C", "F", "G", "I"]);
-    deepEqual(values, [ "1", "2", "3", "4", "0" ,"0", "0", "0", "0" ]);
+    deepEqual(names,  [ "B", "D", "E", "H", "A",  "C",   "F",    "G", "I"]);
+    deepEqual(values, [ "1", "2", "3", "4", "0" ,"''", "N''", "Null", "0" ]);
+});
+
+test( "Format unusual casing and spacing", function() {
+    var sql = "Insert Into MyTable  (Initials, Num) \n  Values  ('JF', 12345);"
+    var formatted = formatAllInsertStatements(sql);
+    equal(formatted, "Insert Into MyTable  (Initials,   Num)\n             Values  (    'JF', 12345);" )
 });

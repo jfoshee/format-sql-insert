@@ -35,7 +35,8 @@
     }
     
     var isInteresting = function(value) {
-        return value != '0';
+        return !(value == '0' || value == "''" || 
+            value == "N''" || value.toUpperCase() == "NULL");
     }
 
     var indexOfUninteresting = function(values, startingIndex) {
@@ -86,6 +87,7 @@
         var insert_args = splitAndTrim(insert_clause_split[1]);
         var values_clause_split = splitArgList(values_clause);
         var values_args = splitAndTrim(values_clause_split[1]);
+        orderByInterestingValues(insert_args, values_args);
         padByLonger(insert_args, values_args);
         var opening_length = insert_clause_split[0].length;
         values_clause_split[0] = padLeft(values_clause_split[0], opening_length);
@@ -95,7 +97,7 @@
     }
     
     var formatAllInsertStatements = function(sql) {
-        var insertRegex = /INSERT .* VALUES \(.*\)/igm;
+        var insertRegex = /INSERT.*\s*VALUES\s*\(.*\)/igm;
         return sql.replace(insertRegex, function(match) {
             return formatInsertStatement(match);
         });
