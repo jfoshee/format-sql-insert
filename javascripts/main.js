@@ -1,12 +1,9 @@
-var setupSqlInsertFormatter = function() {
-    $('#output').text('Ready');
-    
     var splitArgList = function (s) {
         var first_paren = s.indexOf('(') + 1;
         var opening = s.substring(0, first_paren).trim();
         var args_closing = s.substring(first_paren);
         var last_paren = args_closing.lastIndexOf(')');
-        var args = args_closing.substring(0, last_paren)
+        var args = args_closing.substring(0, last_paren);
         var closing = args_closing.substring(last_paren).trim();
         return [opening, args, closing];
     };
@@ -14,7 +11,7 @@ var setupSqlInsertFormatter = function() {
     var splitAndTrim = function (s) {
         var items = s.split(',');
         var trimmed = items.map(function (i) {
-            return i.trim()
+            return i.trim();
         });
         return trimmed;
     }
@@ -37,8 +34,51 @@ var setupSqlInsertFormatter = function() {
         return [A, B];
     }
     
+    var isInteresting = function(value) {
+        return value != '0';
+    }
+
+    var indexOfUninteresting = function(values, startingIndex) {
+        var len = values.length;
+        for (var i = startingIndex; i != len; ++i) {
+            if (!isInteresting(values[i]))
+                return i;
+        }
+        return len;
+    }
+
+    var indexOfInteresting = function(values, startingIndex) {
+        var len = values.length;
+        for (var i = startingIndex; i != len; ++i) {
+            if (isInteresting(values[i]))
+                return i;
+        }
+        return len;
+    }
+
+    Array.prototype.move = function(from, to) {
+        this.splice(to, 0, this.splice(from, 1)[0]);
+    };
+    
+    var moveNextInterestingValue = function(names, values, i) {
+        var unx = indexOfUninteresting(values, i);
+        var inx = indexOfInteresting(values, unx);
+        if (inx > unx) {
+            values.move(inx, unx);
+            names.move(inx, unx);
+        }
+        return [names, values];
+    };
+
+    var orderByInterestingValues = function(names, values) {
+        var partition = 0;
+        var len = values.length;
+        for (var i = 0; i != len; i++) {
+        }
+    }
+    
     var formatInsertStatement = function(sql) {
-        var insert_index = sql.indexOf('VALUES');
+        var insert_index = sql.toUpperCase().indexOf('VALUES');
         var insert_clause = sql.substring(0, insert_index);
         var values_clause = sql.substring(insert_index);
         var insert_clause_split = splitArgList(insert_clause);
@@ -59,7 +99,10 @@ var setupSqlInsertFormatter = function() {
             return formatInsertStatement(match);
         });
     }
-    
+
+
+var setupSqlInsertFormatter = function() {
+    $('#output').text('Ready');    
     $('#format').click(function () {
         var sql = $('#sql').val();
         var output = formatAllInsertStatements(sql) + "\n";
