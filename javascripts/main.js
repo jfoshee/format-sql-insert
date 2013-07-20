@@ -63,7 +63,7 @@
     var moveNextInterestingValue = function(names, values, i) {
         var unx = indexOfUninteresting(values, i);
         var inx = indexOfInteresting(values, unx);
-        if (inx > unx) {
+        if (inx < values.length && inx > unx) {
             values.move(inx, unx);
             names.move(inx, unx);
         }
@@ -71,10 +71,11 @@
     };
 
     var orderByInterestingValues = function(names, values) {
-        var partition = 0;
         var len = values.length;
         for (var i = 0; i != len; i++) {
+            moveNextInterestingValue(names, values, i);
         }
+        return [names, values];
     }
     
     var formatInsertStatement = function(sql) {

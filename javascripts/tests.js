@@ -19,3 +19,19 @@ test( "Move interesting to beginning", function() {
     deepEqual(names,  ["C", "A", "B" ]);
     deepEqual(values, ["1", "0", "0" ]);
 });
+
+test( "Move next interesting to beginning", function() {
+    var names =  [ "A", "B", "C", "D", "E"];
+    var values = [ "1", "0", "0", "2", "3" ];
+    moveNextInterestingValue(names, values, 1);
+    deepEqual(names,  [ "A", "D", "B", "C", "E"]);
+    deepEqual(values, [ "1", "2", "0", "0", "3" ]);
+});
+
+test( "Move all interesting to beginning", function() {
+    var names =  [ "A", "B", "C", "D", "E", "F", "G", "H", "I"];
+    var values = [ "0", "1", "0", "2", "3", "0", "0", "4", "0" ];
+    orderByInterestingValues(names, values);
+    deepEqual(names,  [ "B", "D", "E", "H", "A", "C", "F", "G", "I"]);
+    deepEqual(values, [ "1", "2", "3", "4", "0" ,"0", "0", "0", "0" ]);
+});
