@@ -41,3 +41,9 @@ test( "Format unusual casing and spacing", function() {
     var formatted = formatAllInsertStatements(sql);
     equal(formatted, "Insert Into MyTable  (Initials,   Num)\n             Values  (    'JF', 12345);" )
 });
+
+test( "Tolerate commas in Decimal values", function() {
+    var values_args = "CAST(1.23 AS Decimal(5, 2)), 'abc'";
+    var split = splitAndTrim(values_args);
+    deepEqual(split, ["CAST(1.23 AS Decimal(5, 2))", "'abc'"]);
+});

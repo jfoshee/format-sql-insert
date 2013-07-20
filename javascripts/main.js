@@ -9,7 +9,8 @@
     };
     
     var splitAndTrim = function (s) {
-        var items = s.split(',');
+        var regex = /,(?![^(]*\))/;
+        var items = s.split(regex);
         var trimmed = items.map(function (i) {
             return i.trim();
         });
