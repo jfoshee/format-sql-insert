@@ -38,7 +38,8 @@
         <h3>Enter SQL Insert Statements</h3>
         To format them such that column names line up with values, 
         and interesting values are listed first (e.g. non-null, non-zero).
-        <textarea id="sql" rows="4" cols="80">INSERT INTO Production.UnitMeasure (Name, UnitMeasureCode, ModifiedDate) VALUES (N'Square Yards', N'Y2', GETDATE());</textarea>
+        <textarea id="sql" rows="4" cols="80">INSERT INTO [dbo].[SuperHeroes] (Name, Weakness, HomePlanet, Age) VALUES (N'Kent, Clark', NULL, N'Krypton', 33); 
+INSERT Villains (Name, TrueName, Location) VALUES ("Joker", "", "Gotham"); </textarea>
         <br />
         <a class="btn" href="#" id="format">Format</a>        
         <br />

@@ -59,3 +59,13 @@ test( "Tolerate commas in double quoted string", function() {
     var split = splitAndTrim(values_args);
     deepEqual(split, ['"1,2"', '"abc"']);
 });
+
+test( "Tolerates more values than columns", function() {
+    var sql = "INSERT tbl (A, B)  VALUES (1, 2, 3)";
+    equal(formatInsertStatement(sql), "INSERT tbl (A, B)\n    VALUES (1, 2, 3)");
+})
+
+test( "Tolerates more columns than values", function() {
+    var sql = "INSERT tbl (A, B, C)  VALUES (1, 2)";
+    equal(formatInsertStatement(sql), "INSERT tbl (A, B, C)\n    VALUES (1, 2)");
+})

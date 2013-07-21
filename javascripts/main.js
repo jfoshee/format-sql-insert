@@ -25,7 +25,7 @@
     }
     
     var padByLonger = function (A, B) {
-        var len = A.length;
+        var len = Math.min(A.length, B.length);
         for (var i = 0; i != len; ++i) {
             var a = A[i];
             var b = B[i];
@@ -37,7 +37,7 @@
     }
     
     var isInteresting = function(value) {
-        return !(value == '0' || value == "''" || 
+        return !(value == '0' || value == "''" || value == '""' || 
             value == "N''" || value.toUpperCase() == "NULL");
     }
 
