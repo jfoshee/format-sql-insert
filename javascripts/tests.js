@@ -47,3 +47,9 @@ test( "Tolerate commas in Decimal values", function() {
     var split = splitAndTrim(values_args);
     deepEqual(split, ["CAST(1.23 AS Decimal(5, 2))", "'abc'"]);
 });
+
+test( "Tolerate commas in single quoted string", function() {
+    var values_args = "'1,2', 'abc'";
+    var split = splitAndTrim(values_args);
+    deepEqual(split, ["'1,2'", "'abc'"]);
+});
