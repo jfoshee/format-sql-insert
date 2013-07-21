@@ -35,7 +35,9 @@
 
     <div class="container">
       <section id="main_content">
-        Enter SQL Insert statements to format them such that column names line up with values. 
+        <h3>Enter SQL Insert Statements</h3>
+        To format them such that column names line up with values, 
+        and interesting values are listed first (e.g. non-null, non-zero).
         <textarea id="sql" rows="4" cols="80">INSERT INTO Production.UnitMeasure (Name, UnitMeasureCode, ModifiedDate) VALUES (N'Square Yards', N'Y2', GETDATE());</textarea>
         <br />
         <a class="btn" href="#" id="format">Format</a>        
@@ -48,9 +50,10 @@
     <footer>
         <div class="container">
             <h6>
-                Use at your own risk. 
-                Known issues: Can't handle commas in double-quoted strings.
-                Pull requests welcome if the code is clean. &#9786; &pi;
+                This project developed in the <a href="http://c9.io">Cloud9 IDE</a> 
+                and hosted with <a href="http://pages.github.com/">GitHub Pages</a>.
+                Pull requests welcome if the code is clean.
+                Questions: <a href="http://twitter.com/82unpluggd">@82unpluggd</a>
             </h6>
         </div>
     </footer>

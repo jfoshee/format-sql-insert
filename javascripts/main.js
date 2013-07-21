@@ -9,7 +9,8 @@
     };
     
     var splitAndTrim = function (s) {
-        var regex = /,(?![^(]*\))(?=(?:[^']|'[^']*')*$)/;
+        // Match commas outside parens, outside single quotes, outside double quotes           
+        var regex = /,(?![^(]*\))(?=(?:[^']|'[^']*')*$)(?=(?:[^"]|"[^"]*")*$)/;
         var items = s.split(regex);
         var trimmed = items.map(function (i) {
             return i.trim();

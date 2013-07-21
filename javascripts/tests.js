@@ -53,3 +53,9 @@ test( "Tolerate commas in single quoted string", function() {
     var split = splitAndTrim(values_args);
     deepEqual(split, ["'1,2'", "'abc'"]);
 });
+
+test( "Tolerate commas in double quoted string", function() {
+    var values_args = '"1,2", "abc"';
+    var split = splitAndTrim(values_args);
+    deepEqual(split, ['"1,2"', '"abc"']);
+});
