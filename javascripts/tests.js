@@ -69,3 +69,11 @@ test( "Tolerates more columns than values", function() {
     var sql = "INSERT tbl (A, B, C)  VALUES (1, 2)";
     equal(formatInsertStatement(sql), "INSERT tbl (A, B, C)\n    VALUES (1, 2)");
 })
+
+test( "Handle multiple values clauses for multi-record insert", function() {
+    var sql = "INSERT tbl (Col1, Col2)  VALUES (10, 2000), (30000, 4) ";
+    equal(formatInsertStatement(sql), 
+        "INSERT tbl ( Col1, Col2)\n" +
+        "    VALUES (   10, 2000),\n" +
+        "           (30000,    4)");
+})

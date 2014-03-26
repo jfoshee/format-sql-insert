@@ -16,13 +16,13 @@
             return i.trim();
         });
         return trimmed;
-    }
+    };
     
     var padLeft = function (s, newLength) {
         if (s.length >= newLength) return s;
         var padding = newLength - s.length;
         return Array(padding + 1).join(" ") + s;
-    }
+    };
     
     var padByLonger = function (A, B) {
         var len = Math.min(A.length, B.length);
@@ -34,12 +34,19 @@
             B[i] = padLeft(B[i], stringLength);
         }
         return [A, B];
-    }
+    };
+    
+    var padLeftByArray = function(items, newLengths) {
+        var len = Math.min(items.length, newLengths.length);
+        for (var i = 0; i < len; ++i) {
+            items[i] = padLeft(items[i], newLengths[i]);
+        }
+    };
     
     var isInteresting = function(value) {
         return !(value == '0' || value == "''" || value == '""' || 
             value == "N''" || value.toUpperCase() == "NULL");
-    }
+    };
 
     var indexOfUninteresting = function(values, startingIndex) {
         var len = values.length;
@@ -48,7 +55,7 @@
                 return i;
         }
         return len;
-    }
+    };
 
     var indexOfInteresting = function(values, startingIndex) {
         var len = values.length;
@@ -57,7 +64,7 @@
                 return i;
         }
         return len;
-    }
+    };
 
     Array.prototype.move = function(from, to) {
         this.splice(to, 0, this.splice(from, 1)[0]);
@@ -79,7 +86,14 @@
             moveNextInterestingValue(names, values, i);
         }
         return [names, values];
-    }
+    };
+    
+    var updateMaxLengths = function(A, maxLengths) {
+        for (var i = 0; i < A.length; ++i) {
+            if (maxLengths.length <= i || A[i].length > maxLengths[i])
+                maxLengths[i] = A[i].length;
+        }
+    };
     
     var formatInsertStatement = function(sql) {
         var insert_index = sql.toUpperCase().indexOf('VALUES');
@@ -87,23 +101,53 @@
         var values_clause = sql.substring(insert_index);
         var insert_clause_split = splitArgList(insert_clause);
         var insert_args = splitAndTrim(insert_clause_split[1]);
-        var values_clause_split = splitArgList(values_clause);
-        var values_args = splitAndTrim(values_clause_split[1]);
-        orderByInterestingValues(insert_args, values_args);
-        padByLonger(insert_args, values_args);
-        var opening_length = insert_clause_split[0].length;
-        values_clause_split[0] = padLeft(values_clause_split[0], opening_length);
+
+        var max_lengths = [ ];
+        updateMaxLengths(insert_args, max_lengths);
+
+        var all_values_clauses = splitAndTrim(values_clause);
+        var values_args_array = [];
+        var output_insert_array = [];
+        for (var i = 0; i < all_values_clauses.length; ++i) {
+            var record_clause = all_values_clauses[i];
+            var values_clause_split = splitArgList(record_clause);
+            values_args_array[i] = splitAndTrim(values_clause_split[1]);
+            //var values_args = splitAndTrim(values_clause_split[1]);
+            updateMaxLengths(values_args_array[i], max_lengths);
+        }
+        
+        // Pad everything
+        padLeftByArray(insert_args, max_lengths);
+        for (var i = 0; i < values_args_array.length; ++i) {
+            padLeftByArray(values_args_array[i], max_lengths);
+        }
+        
+        for (var i = 0; i < values_args_array.length; ++i) {
+            var record_clause = all_values_clauses[i];
+            var values_clause_split = splitArgList(record_clause);
+            
+//            orderByInterestingValues(insert_args, values_args);
+//            padByLonger(insert_args, values_args);
+
+            var opening_length = insert_clause_split[0].length;
+            values_clause_split[0] = padLeft(values_clause_split[0], opening_length);
+            var values_args = values_args_array[i];
+            output_insert_array[i] = 
+                values_clause_split[0] + values_args.join(', ') + values_clause_split[2];
+        }
+        
+        var output_insert = output_insert_array.join(',\n');
         var output = insert_clause_split[0] + insert_args.join(', ') + insert_clause_split[2] + '\n' +
-                     values_clause_split[0] + values_args.join(', ') + values_clause_split[2];
+            output_insert;
         return output;
-    }
+    };
     
     var formatAllInsertStatements = function(sql) {
-        var insertRegex = /INSERT.*\s*VALUES\s*\(.*\)/igm;
+        var insertRegex = /INSERT.*\s*VALUES\s*\(.*\)(,\s*\(.*\))?/igm;
         return sql.replace(insertRegex, function(match) {
             return formatInsertStatement(match);
         });
-    }
+    };
 
 
 var setupSqlInsertFormatter = function() {
@@ -113,4 +157,4 @@ var setupSqlInsertFormatter = function() {
         var output = formatAllInsertStatements(sql) + "\n";
         $('#output').text(output);
     });
-}
+};
