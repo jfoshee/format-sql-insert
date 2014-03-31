@@ -112,7 +112,10 @@
             var record_clause = all_values_clauses[i];
             var values_clause_split = splitArgList(record_clause);
             values_args_array[i] = splitAndTrim(values_clause_split[1]);
-            //var values_args = splitAndTrim(values_clause_split[1]);
+            // Order by interesting (for single record)
+            if (values_args_array.length == 1) {
+                orderByInterestingValues(insert_args, values_args_array[i]);
+            }
             updateMaxLengths(values_args_array[i], max_lengths);
         }
         
@@ -121,14 +124,10 @@
         for (var i = 0; i < values_args_array.length; ++i) {
             padLeftByArray(values_args_array[i], max_lengths);
         }
-        
+
         for (var i = 0; i < values_args_array.length; ++i) {
             var record_clause = all_values_clauses[i];
             var values_clause_split = splitArgList(record_clause);
-            
-//            orderByInterestingValues(insert_args, values_args);
-//            padByLonger(insert_args, values_args);
-
             var opening_length = insert_clause_split[0].length;
             values_clause_split[0] = padLeft(values_clause_split[0], opening_length);
             var values_args = values_args_array[i];

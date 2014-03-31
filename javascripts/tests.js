@@ -36,6 +36,13 @@ test( "Move all interesting to beginning", function() {
     deepEqual(values, [ "1", "2", "3", "4", "0" ,"''", "N''", "Null", "0" ]);
 });
 
+test( "Move interesting to beginning in sql statement", function() {
+    var sql = "INSERT tbl (Baz, Foo, Bar) VALUES ('', 'JF', 123);"
+    var formatted = formatAllInsertStatements(sql);
+    ok(formatted.indexOf(" Foo, Bar, Baz") > 0, formatted);
+    ok(formatted.indexOf("'JF', 123,  ''") > 0, formatted);
+});
+
 test( "Format unusual casing and spacing", function() {
     var sql = "Insert Into MyTable  (Initials, Num) \n  Values  ('JF', 12345);"
     var formatted = formatAllInsertStatements(sql);
@@ -63,12 +70,12 @@ test( "Tolerate commas in double quoted string", function() {
 test( "Tolerates more values than columns", function() {
     var sql = "INSERT tbl (A, B)  VALUES (1, 2, 3)";
     equal(formatInsertStatement(sql), "INSERT tbl (A, B)\n    VALUES (1, 2, 3)");
-})
+});
 
 test( "Tolerates more columns than values", function() {
     var sql = "INSERT tbl (A, B, C)  VALUES (1, 2)";
     equal(formatInsertStatement(sql), "INSERT tbl (A, B, C)\n    VALUES (1, 2)");
-})
+});
 
 test( "Handle multiple values clauses for multi-record insert", function() {
     var sql = "INSERT tbl (Col1, Col2)  VALUES (10, 2000), (30000, 4) ";
@@ -76,4 +83,4 @@ test( "Handle multiple values clauses for multi-record insert", function() {
         "INSERT tbl ( Col1, Col2)\n" +
         "    VALUES (   10, 2000),\n" +
         "           (30000,    4)");
-})
+});
