@@ -189,7 +189,7 @@
     };
     
     var formatAllInsertStatements = function(sql) {
-        var insertRegex = /INSERT.*\s*VALUES\s*\(.*\)(,\s*\(.*\))?/igm;
+        var insertRegex = /INSERT.*\s*VALUES\s*\(.*\)(,\s*\(.*\))*/igm;
         return sql.replace(insertRegex, function(match) {
             return formatInsertStatement(match);
         });

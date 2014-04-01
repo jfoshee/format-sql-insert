@@ -85,6 +85,17 @@ test( "Handle multiple values clauses for multi-record insert", function() {
         "           (30000,    4)");
 });
 
+test( "Handle multiple newlines in multi-record insert", function() {
+    var sql = "INSERT tbl (A, Z)  VALUES " + 
+        "(1, 11),\n (2, \n 22), \n(3, 33),\r\n (4,44)";
+    equal(formatInsertStatement(sql), 
+        "INSERT tbl (A,  Z)\n" +
+        "    VALUES (1, 11),\n" +
+        "           (2, 22),\n" +
+        "           (3, 33),\n" +
+        "           (4, 44)");
+});
+
 test( "Order by interesting for multiple records", function() {
     var sql = "INSERT tbl (C, A, D, B)  VALUES (0, 10, NULL, '')," +
     "('', 0, 0, 'Foo') ";
