@@ -125,13 +125,16 @@
         
         // Sort by interestingness
         var interesting_count = [];
-        for (var i = 0; i < values_args_array.length; ++i) {
-            for(var j = 0; j < values_args_array[i].length; ++j) {
+        for(var j = 0; j < values_args_array[0].length; ++j) {
+            var seen = [];
+            for (var i = 0; i < values_args_array.length; ++i) {
                 if (interesting_count.length <= j) {
                     interesting_count[j] = 0;
                 }
-                if (isInteresting(values_args_array[i][j])) {
+                var value = values_args_array[i][j];
+                if (isInteresting(value) && -1 === seen.indexOf(value)) {
                     interesting_count[j]++;
+                    seen.push(value);
                 }
             }
         }

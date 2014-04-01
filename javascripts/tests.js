@@ -97,13 +97,16 @@ test( "Order by interesting for multiple records", function() {
 test( "Changing values considered more interesting", function() {
     var sql = "INSERT tbl (D, B, C, A)  VALUES " + 
     "(0, 0, 1, 2)," +
-    "(0, 10, 0, 3)," +
-    "(0, 20, 0, 4)," +
+    "(0, 10, 1, 3)," +
+    "(0, 20, 1, 4)," +
     "(0, 0, 1, 5)";
     equal(formatInsertStatement(sql), 
         "INSERT tbl (A,  B, C, D)\n" +
         "    VALUES (2,  0, 1, 0),\n" +
-        "           (3, 10, 0, 0),\n" +
-        "           (4, 20, 0, 0),\n" +
+        "           (3, 10, 1, 0),\n" +
+        "           (4, 20, 1, 0),\n" +
         "           (5,  0, 1, 0)");
 });
+
+// TODO: Handle multiple record insertion with mixed lengths
+
