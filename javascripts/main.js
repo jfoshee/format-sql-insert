@@ -128,6 +128,8 @@
         for(var j = 0; j < values_args_array[0].length; ++j) {
             var seen = [];
             for (var i = 0; i < values_args_array.length; ++i) {
+                if (values_args_array[i].length <= j)
+                    break;
                 if (interesting_count.length <= j) {
                     interesting_count[j] = 0;
                 }

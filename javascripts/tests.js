@@ -108,5 +108,10 @@ test( "Changing values considered more interesting", function() {
         "           (5,  0, 1, 0)");
 });
 
-// TODO: Handle multiple record insertion with mixed lengths
-
+test( "Handle multiple record insertion with mixed lengths", function() {
+    var sql = "INSERT tbl (A, B)  VALUES (1, 2, 3), (10, 20)";
+    equal(formatInsertStatement(sql), 
+        "INSERT tbl ( A,  B)\n" +
+        "    VALUES ( 1,  2, 3),\n" +
+        "           (10, 20)");
+});
