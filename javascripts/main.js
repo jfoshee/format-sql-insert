@@ -97,7 +97,7 @@
     
     var zip = function(arrays) {
         return arrays[0].map(function(_,i){
-            return arrays.map(function(array){return array[i]})
+            return arrays.map(function(array){return array[i]});
         });
     };
     
@@ -107,71 +107,84 @@
         return sorted.map(function(a){return a[0];});
     };
     
-    var formatInsertStatement = function(sql) {
-        var insert_index = sql.toUpperCase().indexOf('VALUES');
-        var insert_clause = sql.substring(0, insert_index);
-        var values_clause = sql.substring(insert_index);
-        var all_values_clauses = splitAndTrim(values_clause);
-        var insert_clause_split = splitArgList(insert_clause);
-        var insert_args = splitAndTrim(insert_clause_split[1]);
-        
-        // Split values args
-        var values_args_array = [];
-        for (var i = 0; i < all_values_clauses.length; ++i) {
-            var record_clause = all_values_clauses[i];
-            var values_clause_split = splitArgList(record_clause);
-            values_args_array[i] = splitAndTrim(values_clause_split[1]);
-        }
-        
-        // Sort by interestingness
+    var sortByInterestingness = function(columnNames, valuesMatrix) {
         var interesting_count = [];
-        for(var j = 0; j < values_args_array[0].length; ++j) {
+        for(var j = 0; j < valuesMatrix[0].length; ++j) {
             var seen = [];
-            for (var i = 0; i < values_args_array.length; ++i) {
-                if (values_args_array[i].length <= j)
+            for (var i = 0; i < valuesMatrix.length; ++i) {
+                if (valuesMatrix[i].length <= j)
                     break;
                 if (interesting_count.length <= j) {
                     interesting_count[j] = 0;
                 }
-                var value = values_args_array[i][j];
+                var value = valuesMatrix[i][j];
                 if (isInteresting(value) && -1 === seen.indexOf(value)) {
                     interesting_count[j]++;
                     seen.push(value);
                 }
             }
         }
-        insert_args = sortByWeights(insert_args, interesting_count);
-        for (var i = 0; i < values_args_array.length; ++i) {
-            values_args_array[i] = sortByWeights(values_args_array[i], interesting_count);
+        var sortedColumnNames = sortByWeights(columnNames, interesting_count);
+        columnNames.map(function(v,i,a) { a[i] = sortedColumnNames[i]; });
+        valuesMatrix.map(function(v,i,a) { a[i] = sortByWeights(a[i], interesting_count); });
+    };
+    
+    var findColumnWidths = function(columnNames, valuesMatrix) {
+        var columnWidths = [];
+        updateMaxLengths(columnNames, columnWidths);
+        for (var i = 0; i < valuesMatrix.length; ++i) {
+            updateMaxLengths(valuesMatrix[i], columnWidths);
         }
-        
-        // Find column lengths
-        var max_lengths = [];
-        updateMaxLengths(insert_args, max_lengths);
-        for (var i = 0; i < values_args_array.length; ++i) {
-            updateMaxLengths(values_args_array[i], max_lengths);
+        return columnWidths;
+    };
+    
+    var splitAndTrimValues = function(all_values_clauses) {
+        var valuesMatrix = [];
+        for (var i = 0; i < all_values_clauses.length; ++i) {
+            var record_clause = all_values_clauses[i];
+            var values_clause_split = splitArgList(record_clause);
+            valuesMatrix[i] = splitAndTrim(values_clause_split[1]);
         }
-        
-        // Pad everything
-        padLeftByArray(insert_args, max_lengths);
-        for (var i = 0; i < values_args_array.length; ++i) {
-            padLeftByArray(values_args_array[i], max_lengths);
-        }
-
-        // Compose output for statement
+        return valuesMatrix;
+    };
+    
+    var recomposeInsertStatement = function(all_values_clauses, insert_clause_split, columnNames, valuesMatrix) {
         var output_insert_array = [];
-        for (var i = 0; i < values_args_array.length; ++i) {
+        for (var i = 0; i < valuesMatrix.length; ++i) {
             var record_clause = all_values_clauses[i];
             var values_clause_split = splitArgList(record_clause);
             var opening_length = insert_clause_split[0].length;
             values_clause_split[0] = padLeft(values_clause_split[0], opening_length);
-            var values_args = values_args_array[i];
+            var values_args = valuesMatrix[i];
             output_insert_array[i] = 
                 values_clause_split[0] + values_args.join(', ') + values_clause_split[2];
         }
         var output_insert = output_insert_array.join(',\n');
-        var output = insert_clause_split[0] + insert_args.join(', ') + insert_clause_split[2] + '\n' +
+        var output = insert_clause_split[0] + columnNames.join(', ') + insert_clause_split[2] + '\n' +
             output_insert;
+        return output;
+    };
+    
+    var padColumnNamesAndValues = function(columnNames, valuesMatrix, columnWidths) {
+        padLeftByArray(columnNames, columnWidths);
+        for (var i = 0; i < valuesMatrix.length; ++i) {
+            padLeftByArray(valuesMatrix[i], columnWidths);
+        }
+    };
+    
+    var formatInsertStatement = function(sql) {
+        var insert_index = sql.toUpperCase().indexOf('VALUES');
+        var insert_clause = sql.substring(0, insert_index);
+        var values_clause = sql.substring(insert_index);
+        var all_values_clauses = splitAndTrim(values_clause);
+        var insert_clause_split = splitArgList(insert_clause);
+        var columnNames = splitAndTrim(insert_clause_split[1]);
+        var valuesMatrix = splitAndTrimValues(all_values_clauses);
+        sortByInterestingness(columnNames, valuesMatrix);
+        var columnWidths = findColumnWidths(columnNames, valuesMatrix);
+        padColumnNamesAndValues(columnNames, valuesMatrix, columnWidths);
+        var output = recomposeInsertStatement(
+            all_values_clauses, insert_clause_split, columnNames, valuesMatrix);
         return output;
     };
     
