@@ -84,3 +84,26 @@ test( "Handle multiple values clauses for multi-record insert", function() {
         "    VALUES (   10, 2000),\n" +
         "           (30000,    4)");
 });
+
+test( "Order by interesting for multiple records", function() {
+    var sql = "INSERT tbl (C, A, D, B)  VALUES (0, 10, NULL, '')," +
+    "('', 0, 0, 'Foo') ";
+    equal(formatInsertStatement(sql), 
+        "INSERT tbl ( A,     B,  C,    D)\n" +
+        "    VALUES (10,    '',  0, NULL),\n" +
+        "           ( 0, 'Foo', '',    0)");
+});
+
+test( "Changing values considered more interesting", function() {
+    var sql = "INSERT tbl (D, B, C, A)  VALUES " + 
+    "(0, 0, 1, 2)," +
+    "(0, 10, 0, 3)," +
+    "(0, 20, 0, 4)," +
+    "(0, 0, 1, 5)";
+    equal(formatInsertStatement(sql), 
+        "INSERT tbl (A,  B, C, D)\n" +
+        "    VALUES (2,  0, 1, 0),\n" +
+        "           (3, 10, 0, 0),\n" +
+        "           (4, 20, 0, 0),\n" +
+        "           (5,  0, 1, 0)");
+});

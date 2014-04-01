@@ -95,27 +95,55 @@
         }
     };
     
+    var zip = function(arrays) {
+        return arrays[0].map(function(_,i){
+            return arrays.map(function(array){return array[i]})
+        });
+    };
+    
+    var sortByWeights = function(items, weights) {
+        var zipped = zip([items, weights]);
+        var sorted = zipped.sort(function(a,b){return -a[1] + b[1];});
+        return sorted.map(function(a){return a[0];});
+    };
+    
     var formatInsertStatement = function(sql) {
         var insert_index = sql.toUpperCase().indexOf('VALUES');
         var insert_clause = sql.substring(0, insert_index);
         var values_clause = sql.substring(insert_index);
+        var all_values_clauses = splitAndTrim(values_clause);
         var insert_clause_split = splitArgList(insert_clause);
         var insert_args = splitAndTrim(insert_clause_split[1]);
-
-        var max_lengths = [ ];
-        updateMaxLengths(insert_args, max_lengths);
-
-        var all_values_clauses = splitAndTrim(values_clause);
+        
+        // Split values args
         var values_args_array = [];
-        var output_insert_array = [];
         for (var i = 0; i < all_values_clauses.length; ++i) {
             var record_clause = all_values_clauses[i];
             var values_clause_split = splitArgList(record_clause);
             values_args_array[i] = splitAndTrim(values_clause_split[1]);
-            // Order by interesting (for single record)
-            if (values_args_array.length == 1) {
-                orderByInterestingValues(insert_args, values_args_array[i]);
+        }
+        
+        // Sort by interestingness
+        var interesting_count = [];
+        for (var i = 0; i < values_args_array.length; ++i) {
+            for(var j = 0; j < values_args_array[i].length; ++j) {
+                if (interesting_count.length <= j) {
+                    interesting_count[j] = 0;
+                }
+                if (isInteresting(values_args_array[i][j])) {
+                    interesting_count[j]++;
+                }
             }
+        }
+        insert_args = sortByWeights(insert_args, interesting_count);
+        for (var i = 0; i < values_args_array.length; ++i) {
+            values_args_array[i] = sortByWeights(values_args_array[i], interesting_count);
+        }
+        
+        // Find column lengths
+        var max_lengths = [];
+        updateMaxLengths(insert_args, max_lengths);
+        for (var i = 0; i < values_args_array.length; ++i) {
             updateMaxLengths(values_args_array[i], max_lengths);
         }
         
@@ -125,6 +153,8 @@
             padLeftByArray(values_args_array[i], max_lengths);
         }
 
+        // Compose output for statement
+        var output_insert_array = [];
         for (var i = 0; i < values_args_array.length; ++i) {
             var record_clause = all_values_clauses[i];
             var values_clause_split = splitArgList(record_clause);
@@ -134,7 +164,6 @@
             output_insert_array[i] = 
                 values_clause_split[0] + values_args.join(', ') + values_clause_split[2];
         }
-        
         var output_insert = output_insert_array.join(',\n');
         var output = insert_clause_split[0] + insert_args.join(', ') + insert_clause_split[2] + '\n' +
             output_insert;
